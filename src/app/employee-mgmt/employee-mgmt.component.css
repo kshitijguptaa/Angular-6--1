@@ -1,0 +1,13 @@
+.example-additional-selection {
+    opacity: 0.75;
+    font-size: 0.75em;
+  }
+  table {
+    border:1px solid gray;
+    border-collapse: collapse;
+  }
+  
+  td,th {
+    border:1px solid #ccc;
+    padding:1rem;
+  }

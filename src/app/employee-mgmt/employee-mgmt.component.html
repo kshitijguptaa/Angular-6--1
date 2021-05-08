@@ -1,0 +1,347 @@
+<div class="panel-body bio-graph-info">
+  <div>
+    <!-- <input type="file" name="photo" ng2FileSelect [uploader]="uploader" /> -->
+
+    <!-- <button type="button" class="btn btn-success btn-s" 
+      (click)="uploader.uploadAll()" 
+      [disabled]="!uploader.getNotUploadedItems().length" >
+          Upload an Image
+    </button> -->
+    <h1>Employee Management <button type="button" (click)="addEmployeee()">Add Employee</button></h1>
+    <form #search="ngForm" (ngSubmit)="searchEmp(search)">
+          <div class="col-md-12">
+            <input style="font-size: large;" type="search" #searchValue="ngModel"
+              [(ngModel)]="searchValues" name="searchValue" placeholder="search">
+              <button type="submit" >Search</button>
+              <button *ngIf="searchResult === true" (click)="getEmployeeList(); searchResult === false" > Show All</button>
+          </div>
+    </form>
+  </div>
+  <div *ngIf="showAddEmp">
+    <form #signUpForm="ngForm" (ngSubmit)="signUpForm.valid && onSubmitAdd(signUpForm)">
+      <div class="border border-dark">
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>First Name</h4>
+          </div>
+          <div class="col-md-6">
+            <input style="font-size: large;" type="text" #firstName="ngModel"
+              [(ngModel)]="userService.selectedUser.firstName" name="firstName" placeholder="First Name" required
+              [ngClass]="{'invalid-textbox' :signUpForm.submitted && !firstName.valid}">
+            <div *ngIf="signUpForm.submitted && !firstName.valid">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Last Name</h4>
+          </div>
+          <div class="col-md-6">
+            <input style="font-size: large;" type="text" #lastName="ngModel"
+              [(ngModel)]="userService.selectedUser.lastName" name="lastName" placeholder="Last Name" required
+              [ngClass]="{'invalid-textbox' :signUpForm.submitted && !lastName.valid }">
+            <div *ngIf="signUpForm.submitted && !lastName.valid">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Birth Date</h4>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input required matInput name="DOB" [(ngModel)]="userService.selectedUser.dob"
+                [ngClass]="{'invalid-textbox' :signUpForm.submitted && !DOB.valid }" [matDatepicker]="picker"
+                placeholder="Birth Date">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <div *ngIf="signUpForm.submitted && !DOB.valid">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="col-md-12">
+            <div class="col-md-6">
+              <h4>Employee Type</h4>
+            </div>
+            <div class="col-md-6">
+              <div class="col-md-6">
+                <input type="radio" #employeeType="ngModel" [(ngModel)]="userService.selectedUser.empType" value="WFH"
+                  name="employeeType" required
+                  [ngClass]="{'invalid-textbox' :signUpForm.submitted && !employeeType.valid }">
+                <label for="employeeType">WFH</label>
+              </div>
+              <div class="col-md-6">
+                <input type="radio" #employeeType="ngModel" [(ngModel)]="userService.selectedUser.empType"
+                  value="Office Work Place" name="employeeType" required
+                  [ngClass]="{'invalid-textbox' :signUpForm.submitted && !employeeType.valid }">
+                <label for="employeeType">Office Workplace</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Hobbies</h4>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6">
+              <ng-multiselect-dropdown name="hobbies" #hobbies="ngModel" [placeholder]="'custom placeholder'"
+                [settings]="dropdownSettings" [data]="dropdownList" [(ngModel)]="userService.selectedUser.hobbies"
+                (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
+              </ng-multiselect-dropdown>
+            </div>
+
+            <div *ngIf="signUpForm.submitted && !hobbies.valid">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Email Address</h4>
+          </div>
+
+          <div class="col-md-6"> <input style="font-size: large;" type="text" #email="ngModel"
+              [(ngModel)]="userService.selectedUser.email" name="email" placeholder="Email"></div>
+        </div>
+      </div>
+      <div class="col-md-12">
+
+        <div class="col-md-6 text-center"><input type="submit" value="Add"></div>
+        <div class="col-md-6"><input class="btn btn-secondary" type="button" (click)="showAddEmp = false"
+            value="Cancel"></div>
+      </div>
+
+
+    </form>
+  </div>
+  <div *ngIf="searchResult === false">
+ <div *ngFor="let item of userDetails">
+    <form #signUpForm="ngForm" (ngSubmit)="signUpForm.valid && onSubmitUpdate(signUpForm, item)">
+      <button type="button"><i type="button" title="Edit Profile" class="fas fa-edit"
+          (click)="enableEdit(item._id)"></i></button>
+      <button type="button"><i type="button" title="Delete Profile" class="fas fa-trash"
+          (click)="onClickDelete(item._id)"></i></button>
+      <!-- <button (click)="retriewImage(item._id)">Show Image</button> -->
+      <img [src]="imageToShow" alt="">
+      <div class="border border-dark">
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>First Name</h4>
+          </div>
+          <div class="col-md-6">
+            <input style="font-size: large;" [disabled]="editSwitch === false" type="text" #firstName="ngModel"
+              [(ngModel)]="item.firstName" name="firstName" placeholder="First Name" required
+              [ngClass]="{'invalid-textbox' :signUpForm.submitted && !firstName.valid && editSwitch === true }">
+            <div *ngIf="signUpForm.submitted && !firstName.valid && editSwitch === true">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Last Name</h4>
+          </div>
+          <div class="col-md-6">
+            <input style="font-size: large;" [disabled]="editSwitch === false" type="text" #lastName="ngModel"
+              [(ngModel)]="item.lastName" name="lastName" placeholder="Last Name" required
+              [ngClass]="{'invalid-textbox' :signUpForm.submitted && !lastName.valid && editSwitch === true }">
+            <div *ngIf="signUpForm.submitted && !lastName.valid && editSwitch === true">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Birth Date</h4>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field>
+              <input [disabled]="editSwitch === false" required matInput name="DOB" [(ngModel)]="item.dob"
+                #DOB="ngModel" [matDatepicker]="picker" placeholder="{{item.dob}}">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <div *ngIf="signUpForm.submitted && !DOB.valid && editSwitch === true">
+              <label class="validation-message">This field is required.</label>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Employee type</h4>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-6">
+              <input type="radio" #employeeType="ngModel" [(ngModel)]="item.employeeType" value="WFH"
+                name="employeeType" required
+                [ngClass]="{'invalid-textbox' :signUpForm.submitted && !employeeType.valid }">
+              <label for="employeeType">WFH</label>
+            </div>
+            <div class="col-md-6">
+              <input type="radio" #employeeType="ngModel" [(ngModel)]="item.employeeType" value="Office Work Place"
+                name="employeeType" required
+                [ngClass]="{'invalid-textbox' :signUpForm.submitted && !employeeType.valid }">
+              <label for="employeeType">Office Workplace</label>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Hobbies</h4>
+          </div>
+          <div class="col-md-6">
+            <ng-multiselect-dropdown name="hobbies" #hobbies="ngModel" [placeholder]="'custom placeholder'"
+              [settings]="dropdownSettings" [data]="dropdownList" [(ngModel)]="item.hobbies[0]"
+              (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
+            </ng-multiselect-dropdown>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6">
+            <h4>Email Address</h4>
+          </div>
+
+          <div class="col-md-6"> <input style="font-size: large;" [disabled]="editSwitch === false" type="text"
+              #email="ngModel" [(ngModel)]="item.email" name="email" placeholder="Email"></div>
+        </div>
+      </div>
+      <div class="col-md-12">
+
+        <div class="col-md-6 text-center"><button class="btn btn-warning" style="font-size: large;"
+            *ngIf="editSwitch === true && item._id === updateId" type="submit">Update</button></div>
+        <div class="col-md-6"><button class="btn btn-secondary" style="font-size: large;" type="button"
+            *ngIf="editSwitch === true && item._id === updateId"
+            (click)="editSwitch = false ; updateId = 0">Cancel</button></div>
+      </div>
+
+
+    </form>
+  </div>
+  </div>
+  <div *ngIf="searchResult === true">
+    <div *ngFor="let item of userDetails">
+       <form #signUpForm="ngForm" (ngSubmit)="signUpForm.valid && onSubmitUpdate(signUpForm, item)">
+         <button type="button"><i type="button" title="Edit Profile" class="fas fa-edit"
+             (click)="enableEdit(item._id)"></i></button>
+         <button type="button"><i type="button" title="Delete Profile" class="fas fa-trash"
+             (click)="onClickDelete(item._id)"></i></button>
+         <!-- <button (click)="retriewImage(item._id)">Show Image</button> -->
+         <img [src]="imageToShow" alt="">
+         <div class="border border-dark">
+           <div class="col-md-12">
+             <div class="col-md-6">
+               <h4>First Name</h4>
+             </div>
+             <div class="col-md-6">
+               <input style="font-size: large;" [disabled]="editSwitch === false" type="text" #firstName="ngModel"
+                 [(ngModel)]="item.firstName" name="firstName" placeholder="First Name" required
+                 [ngClass]="{'invalid-textbox' :signUpForm.submitted && !firstName.valid && editSwitch === true }">
+               <div *ngIf="signUpForm.submitted && !firstName.valid && editSwitch === true">
+                 <label class="validation-message">This field is required.</label>
+               </div>
+             </div>
+           </div>
+   
+           <div class="col-md-12">
+             <div class="col-md-6">
+               <h4>Last Name</h4>
+             </div>
+             <div class="col-md-6">
+               <input style="font-size: large;" [disabled]="editSwitch === false" type="text" #lastName="ngModel"
+                 [(ngModel)]="item.lastName" name="lastName" placeholder="Last Name" required
+                 [ngClass]="{'invalid-textbox' :signUpForm.submitted && !lastName.valid && editSwitch === true }">
+               <div *ngIf="signUpForm.submitted && !lastName.valid && editSwitch === true">
+                 <label class="validation-message">This field is required.</label>
+               </div>
+             </div>
+           </div>
+   
+           <div class="col-md-12">
+             <div class="col-md-6">
+               <h4>Birth Date</h4>
+             </div>
+             <div class="col-md-6">
+               <mat-form-field>
+                 <input [disabled]="editSwitch === false" required matInput name="DOB" [(ngModel)]="item.dob"
+                   #DOB="ngModel" [matDatepicker]="picker" placeholder="{{item.dob}}">
+                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                 <mat-datepicker #picker></mat-datepicker>
+               </mat-form-field>
+   
+               <div *ngIf="signUpForm.submitted && !DOB.valid && editSwitch === true">
+                 <label class="validation-message">This field is required.</label>
+               </div>
+             </div>
+           </div>
+           <div class="col-md-12">
+             <div class="col-md-6">
+               <h4>Employee type</h4>
+             </div>
+             <div class="col-md-6">
+               <div class="col-md-6">
+                 <input type="radio" #employeeType="ngModel" [(ngModel)]="item.employeeType" value="WFH"
+                   name="employeeType" required
+                   [ngClass]="{'invalid-textbox' :signUpForm.submitted && !employeeType.valid }">
+                 <label for="employeeType">WFH</label>
+               </div>
+               <div class="col-md-6">
+                 <input type="radio" #employeeType="ngModel" [(ngModel)]="item.employeeType" value="Office Work Place"
+                   name="employeeType" required
+                   [ngClass]="{'invalid-textbox' :signUpForm.submitted && !employeeType.valid }">
+                 <label for="employeeType">Office Workplace</label>
+               </div>
+             </div>
+   
+           </div>
+           <div class="col-md-12">
+             <div class="col-md-6">
+               <h4>Hobbies</h4>
+             </div>
+             <div class="col-md-6">
+               <ng-multiselect-dropdown name="hobbies" #hobbies="ngModel" [placeholder]="'custom placeholder'"
+                 [settings]="dropdownSettings" [data]="dropdownList" [(ngModel)]="item.hobbies[0]"
+                 (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
+               </ng-multiselect-dropdown>
+             </div>
+           </div>
+   
+           <div class="col-md-12">
+             <div class="col-md-6">
+               <h4>Email Address</h4>
+             </div>
+   
+             <div class="col-md-6"> <input style="font-size: large;" [disabled]="editSwitch === false" type="text"
+                 #email="ngModel" [(ngModel)]="item.email" name="email" placeholder="Email"></div>
+           </div>
+         </div>
+         <div class="col-md-12">
+   
+           <div class="col-md-6 text-center"><button class="btn btn-warning" style="font-size: large;"
+               *ngIf="editSwitch === true && item._id === updateId" type="submit">Update</button></div>
+           <div class="col-md-6"><button class="btn btn-secondary" style="font-size: large;" type="button"
+               *ngIf="editSwitch === true && item._id === updateId"
+               (click)="editSwitch = false ; updateId = 0">Cancel</button></div>
+         </div>
+   
+   
+       </form>
+     </div>
+     </div>
+
+</div>
